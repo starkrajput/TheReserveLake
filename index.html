@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; frame-ancestors 'self'">
+    <title>Billa's Classical Homoeopathy</title>
+    <link rel="icon" type="image/jpg" href="logob.jpg">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            position: fixed;
+            margin: 0;
+            padding: 0;
+        }
+
+        #iframe-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            margin: 0;
+            padding: 0;
+            display: block;
+            outline: none;
+        }
+
+        /* Make favicon glow */
+        @keyframes glowEffect {
+            from {
+                box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+            }
+
+            to {
+                box-shadow: 0 0 15px rgba(255, 255, 255, 0.9);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Layer 2: Content iframe with container -->
+    <div id="iframe-container">
+        <iframe id="content-frame" src="compliance.html" sandbox="allow-same-origin allow-scripts allow-forms" allowfullscreen frameborder="0" scrolling="auto"></iframe>
+    </div>
+</body>
+<script>
+// Basic protection against developer tools and source viewing
+document.addEventListener("contextmenu", event => event.preventDefault());
+document.addEventListener("keydown", event => {
+    // Block F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+    if (event.keyCode == 123 ||
+        (event.ctrlKey && event.shiftKey && event.keyCode == 73) ||
+        (event.ctrlKey && event.shiftKey && event.keyCode == 74) ||
+        (event.ctrlKey && event.keyCode == 85)) {
+        event.preventDefault();
+    }
+});
+
+// Additional protections
+(function() {
+    // Check for developer tools (not foolproof but adds a layer)
+    function checkDevTools() {
+        const widthThreshold = window.outerWidth - window.innerWidth > 160;
+        const heightThreshold = window.outerHeight - window.innerHeight > 160;
+        if (widthThreshold || heightThreshold) {
+            document.body.innerHTML = '<div style="text-align:center;padding:50px;">For security reasons, developer tools are not permitted on this site.</div>';
+        }
+    }
+
+    // Monitor for developer tools opening
+    window.addEventListener('resize', checkDevTools);
+    setInterval(checkDevTools, 1000);
+
+    // Get the iframe element
+    const iframe = document.getElementById('content-frame');
+
+    // Add a timestamp parameter to prevent caching
+    iframe.src = `compliance.html?t=${new Date().getTime()}`;
+
+    // Ensure proper sizing on mobile
+    function resizeIframe() {
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+
+        // Set iframe to match viewport exactly
+        iframe.style.width = viewportWidth + 'px';
+        iframe.style.height = viewportHeight + 'px';
+
+        // Remove any potential borders or outlines
+        iframe.style.border = '0';
+        iframe.style.outline = 'none';
+
+        // Ensure container fills viewport exactly
+        document.getElementById('iframe-container').style.width = viewportWidth + 'px';
+        document.getElementById('iframe-container').style.height = viewportHeight + 'px';
+    }
+
+    // Run on load and resize
+    window.addEventListener('load', resizeIframe);
+    window.addEventListener('resize', resizeIframe);
+
+    // Call immediately as well
+    resizeIframe();
+
+    // For mobile devices specifically
+    window.addEventListener('orientationchange', function() {
+        setTimeout(resizeIframe, 100); // Short delay to allow orientation to complete
+    });
+
+    // Disable view-source via URL
+    if (window.location.href.includes('view-source:')) {
+        window.location.href = window.location.href.replace('view-source:', '');
+    }
+
+    // Detect and respond to debugging attempts
+    const debuggerDetector = function() {
+        debugger; // This makes it harder to step through the code
+    };
+    setInterval(debuggerDetector, 100);
+
+    // Modify toString methods to prevent easy identification
+    Function.prototype.toString = function() {
+        return 'function() { [protected code] }';
+    };
+})();
+</script>
+</html>
